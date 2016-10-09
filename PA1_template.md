@@ -1,13 +1,9 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+
+```r
 library(data.table)
 library(lubridate)
 filename <- "./activity.csv"
@@ -20,17 +16,30 @@ dataset$date <- ymd(dataset$date)
 
 
 ## What is mean total number of steps taken per day?
-```{r message=FALSE}
+
+```r
 library(dplyr)
 totalStepsPerDay <- dataset %>%
     group_by(date) %>%
     summarise(total = sum(steps, na.rm = TRUE))
 mean(totalStepsPerDay$total)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(totalStepsPerDay$total)
 ```
 
+```
+## [1] 10395
+```
+
 ## What is the average daily activity pattern?
-```{r message=FALSE}
+
+```r
 library(ggplot2)
 averageSteps <- dataset %>%
     group_by(interval) %>%
@@ -38,21 +47,36 @@ averageSteps <- dataset %>%
 ggplot(averageSteps, aes(interval, avg)) +
     geom_line() +
     ylab("average number of steps")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 # max of average or just another value for max?
 maximumAVGNumberOfSteps <- averageSteps %>%
     filter(avg == max(averageSteps$avg))
 print(maximumAVGNumberOfSteps$interval)
 ```
 
+```
+## [1] 835
+```
+
 
 
 ## Imputing missing values
 Total missing values in the dataset, only steps that have missing values.
-```{r}
+
+```r
 nrow(dataset[!complete.cases(dataset$steps)])
 ```
+
+```
+## [1] 2304
+```
 Find mean of the days
-```{r message=FALSE}
+
+```r
 meanStepsPerInterval <- dataset %>%
     group_by(interval) %>%
     summarise(mean = mean(steps, na.rm = TRUE))
@@ -71,19 +95,33 @@ completeTotalStepsPerDay <- completeDataset %>%
     group_by(date) %>%
     summarise(steps = sum(steps, na.rm = TRUE))
 qplot(completeTotalStepsPerDay$steps, geom = "histogram", xlab = "total number of steps taken each day")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 `mean` and `median` are different from dataset in the first part.  
 Apperently, imputing missing data increase both mean and median of the dataset.
-```{r}
+
+```r
 mean(completeTotalStepsPerDay$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(completeTotalStepsPerDay$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+
+```r
 # given a date return if it's in a weekday or weekend
 getDayType <- function(date) {
     weekdayName <- weekdays(date)
@@ -101,5 +139,7 @@ ggplot(averageStepsByInterval, aes(interval, steps)) +
     facet_grid(day ~ .) + 
     ylab("Number of steps") +
     xlab("Interval")
-``` 
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
